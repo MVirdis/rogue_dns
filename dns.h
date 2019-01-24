@@ -19,3 +19,5 @@ int isResponse(struct dns_header_t* header);
 int isRecursiveDesired(struct dns_header_t* header);
 int isRecursiveAvailable(struct dns_header_t* header);
 char* getQuests(char* dns_message, struct dns_header_t* header);
+char* getAnsws(char* dns_message, struct dns_header_t* header);
+char* typeLiteral(uint16_t type);

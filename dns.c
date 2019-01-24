@@ -35,7 +35,19 @@ int isRecursiveAvailable(struct dns_header_t* header) {
 }
 
 char* getQuests(char* dns_message, struct dns_header_t* header) {
-	int num = getNumQuest(header);
 	return dns_message + 12;
+}
+
+char* getAnsws(char* dns_message, struct dns_header_t* header) {
+	int num = getNumQuest(header);
+	return dns_message + 12 + num;
+}
+
+char* typeLiteral(uint16_t type) {
+	if (type == A) return "A";
+	else if (type == NS) return "NS";
+	else if (type == CNAME) return "CNAME";
+	else if (type == MX) return "MX";
+	else return "UNKOWN TYPE";
 }
 

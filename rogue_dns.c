@@ -11,6 +11,7 @@
 #define DEFAULT_DNS_PORT 53
 #define MAX_DNS_MESSAGE_LEN 128
 #define REAL_DNS_IP "8.8.8.8"
+#define STAT_STRING "\rRequests received %d, answered %d"
 
 int main(int argc, char** argv) {
 
@@ -36,42 +37,19 @@ int main(int argc, char** argv) {
 	int ssock = socket(AF_INET, SOCK_DGRAM, 0);
 	connect(ssock, (struct sockaddr*)&real_dns_addr, sizeof(real_dns_addr));
 
+	int recv_count = 0, sent_count = 0;
+
 	while(1) {
 		int rlen = recvfrom(sock, &dns_message, MAX_DNS_MESSAGE_LEN, 0,
 				(struct sockaddr*)&sender_addr, &ssize);
+		recv_count++;
+		printf(STAT_STRING, recv_count, sent_count);
 		memcpy(&dns_header, dns_message, 12);
-		printf("Ricevuti %d byte\n", rlen);
-		if (isResponse(&dns_header))
-			printf("\tDNS RESPONSE\n");
-		else
-			printf("\tDNS REQUEST\n");
-		printf("\tID: %d\n", getID(&dns_header));
-		if (isRecursiveDesired(&dns_header))
-			printf("\tRecursion desired: yes\n");
-		else
-			printf("\tRecursion desired: no\n");
-		printf("\tContains %d questions:\n", getNumQuest(&dns_header));
-		int num_q = getNumQuest(&dns_header), i = 0;
-		for(; i < num_q; ++i) {
-			
-		}
-
-		int slen = 0;
-
-		do {
-			slen = send(ssock, dns_message, rlen, 0);
-			sleep(1);
-		} while(slen <= 0);
-
-		printf("Inviati %d byte\n", slen);
+		int slen = send(ssock, dns_message, rlen, 0);
 		rlen = recv(ssock, dns_message, MAX_DNS_MESSAGE_LEN, 0);
-		memcpy(&dns_header, dns_message, 12);
-		printf("Ricevuti %d byte\n", rlen);
-		if (isResponse(&dns_header))
-			printf("\tDNS RESPONSE\n");
-		else
-			printf("\tDNS REQUEST\n");
-		printf("\tID: %d\n", getID(&dns_header));
+		sendto(sock, dns_message, rlen, 0, (struct sockaddr*)&sender_addr, sizeof(sender_addr));
+		sent_count++;
+		printf(STAT_STRING, recv_count, sent_count);
 	}
 
 	return 0;

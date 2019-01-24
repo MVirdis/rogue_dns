@@ -1,3 +1,8 @@
+#define A 1
+#define NS 2
+#define CNAME 5
+#define MX 15
+
 struct dns_header_t {
 	uint16_t id;
 	uint16_t flags;
